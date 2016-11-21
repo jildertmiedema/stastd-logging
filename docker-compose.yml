@@ -1,0 +1,45 @@
+version: '2'
+services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+     - "3000:3000"
+    environment:
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_ORG_CREATE: "false"
+      GF_SECURITY_ADMIN_USER: "admin"
+      GF_SECURITY_ADMIN_PASSWORD: "secret"
+    networks:
+     - appnet
+  influxdb:
+    image: influxdb:latest
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+      - "8090:8090"
+      - "25826:25826"
+      - "25826:25826/udp"
+    volumes:  
+      - ./data/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+      - ./data/influxdb/types.db:/opt/collectd/types.db:ro
+    networks:
+     - appnet
+  collectd:
+    build: ./build/collectd
+    image: jildertmiedema/collectd
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    expose:
+      - "8125/udp"
+    ports:
+      - "8125:8125/udp"
+    networks:
+      - appnet
+networks:
+  appnet:
+    driver: "bridge"
+volumes:
+  data:
+    driver: "local"
