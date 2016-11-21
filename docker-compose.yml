@@ -24,13 +24,15 @@ services:
       - ./data/influxdb/types.db:/opt/collectd/types.db:ro
     networks:
      - appnet
-  collectd:
-    build: ./build/collectd
-    image: jildertmiedema/collectd
-    depends_on:
-      - influxdb
+  telegraf:
+    #build: ./build/collectd
+    image: telegraf:alpine
+    #depends_on:
+    #  - influxdb
+    volumes:
+      - ./data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     links:
-      - influxdb
+      - influxdb:container
     expose:
       - "8125/udp"
     ports:
