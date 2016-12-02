@@ -3,7 +3,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-     - "3000:3000"
+     - "127.0.0.1:3000:3000"
     environment:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_USERS_ALLOW_ORG_CREATE: "false"
@@ -14,21 +14,18 @@ services:
   influxdb:
     image: influxdb:latest
     ports:
-      - "8083:8083"
-      - "8086:8086"
-      - "8090:8090"
-      - "25826:25826"
-      - "25826:25826/udp"
+      - "127.0.0.1:8083:8083"
+      - "127.0.0.1:8086:8086"
+      - "127.0.0.1:8090:8090"
+      - "127.0.0.1:25826:25826"
+      - "127.0.0.1:25826:25826/udp"
     volumes:  
       - ./data/influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
       - ./data/influxdb/types.db:/opt/collectd/types.db:ro
     networks:
      - appnet
   telegraf:
-    #build: ./build/collectd
     image: telegraf:alpine
-    #depends_on:
-    #  - influxdb
     environment:
       HOST_PROC: /rootfs/proc
       HOST_SYS: /rootfs/sys
@@ -46,7 +43,7 @@ services:
     expose:
       - "8125/udp"
     ports:
-      - "8125:8125/udp"
+      - "127.0.0.1:8125:8125/udp"
     networks:
       - appnet
 networks:
